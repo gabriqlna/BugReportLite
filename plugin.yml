@@ -1,5 +1,5 @@
 name: BugReportLite
-version: 1.0.1
+version: 1.0.2
 main: BugReportLite\Main
 api: 5.0.0
 author: gabriqlna
