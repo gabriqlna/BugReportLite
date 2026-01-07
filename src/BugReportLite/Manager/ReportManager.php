@@ -46,8 +46,12 @@ class ReportManager {
         return true;
     }
 
-        public function submitReport(Player $player, string $type, string $description): void {
-        // ... (código anterior de criação do array $data permanece igual) ...
+            public function submitReport(\pocketmine\player\Player $player, string $type, string $description): void {
+        $name = $player->getName();
+        $date = date("Y-m-d");
+        
+        // CORREÇÃO: Definindo o ID logo no começo
+        $id = substr(uniqid(), -7); 
         
         $data = [
             "id" => $id,
@@ -56,9 +60,9 @@ class ReportManager {
             "type" => $type,
             "description" => $description,
             "world" => $player->getWorld()->getFolderName(),
-            "x" => floor($player->getPosition()->getX()),
-            "y" => floor($player->getPosition()->getY()),
-            "z" => floor($player->getPosition()->getZ()),
+            "x" => (int)floor($player->getPosition()->getX()),
+            "y" => (int)floor($player->getPosition()->getY()),
+            "z" => (int)floor($player->getPosition()->getZ()),
             "timestamp" => date("H:i:s")
         ];
 
@@ -67,21 +71,24 @@ class ReportManager {
         $this->dailyCounts[$name] = ($this->dailyCounts[$name] ?? 0) + 1;
         $this->cooldowns[$name] = time() + $this->plugin->getConfig()->getNested("settings.cooldown", 300);
 
-        // AQUI ESTÁ A CORREÇÃO: Usamos serialize($data)
-        
+        // Serializamos os dados para evitar o erro de Thread-Safe
+        $serialized = serialize($data);
+
         // 2. Salva Assincronamente (JSON)
         $filePath = $this->plugin->getDataFolder() . "reports/" . $date . ".json";
-        $this->plugin->getServer()->getAsyncPool()->submitTask(new SaveReportTask($filePath, serialize($data)));
+        $this->plugin->getServer()->getAsyncPool()->submitTask(new \BugReportLite\Task\SaveReportTask($filePath, $serialized));
 
         // 3. Envia Webhook (Opcional)
         if ($this->plugin->getConfig()->getNested("discord.enabled")) {
             $url = $this->plugin->getConfig()->getNested("discord.webhook-url");
-            // AQUI TAMBÉM: serialize($data)
-            $this->plugin->getServer()->getAsyncPool()->submitTask(new DiscordWebhookTask($url, serialize($data)));
+            if(!empty($url) && $url !== "https://discord.com/api/webhooks/..."){
+                $this->plugin->getServer()->getAsyncPool()->submitTask(new \BugReportLite\Task\DiscordWebhookTask($url, $serialized));
+            }
         }
 
         $player->sendMessage($this->getMsg("success"));
     }
+
 
 
     public function getTodayReports(): array {

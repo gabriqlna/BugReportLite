@@ -14,8 +14,10 @@ class SaveReportTask extends AsyncTask {
     public function onRun(): void {
         // Converte a string de volta para array
         $newData = unserialize($this->serializedData);
-
+        
         $currentData = [];
+        // ... restante do código de salvamento de arquivo ...
+
         // Se o arquivo já existe, lê o conteúdo atual
         if (file_exists($this->filePath)) {
             $content = file_get_contents($this->filePath);
