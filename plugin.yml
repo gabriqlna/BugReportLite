@@ -1,5 +1,5 @@
 name: BugReportLite
-version: 1.0.2
+version: 1.0.3
 main: BugReportLite\Main
 api: 5.0.0
 author: gabriqlna
@@ -19,4 +19,5 @@ commands:
     permission: bugreport.staff
   bugtp:
     description: "Teleportar para um local de bug"
+
     permission: bugreport.staff
