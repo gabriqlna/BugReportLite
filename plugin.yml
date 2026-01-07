@@ -1,0 +1,22 @@
+name: BugReportLite
+version: 1.0.0
+main: BugReportLite\Main
+api: 5.0.0
+author: gabriqlna
+permissions:
+  bugreport.use:
+    default: true
+    description: "Permite reportar bugs"
+  bugreport.staff:
+    default: op
+    description: "Permite ver e gerenciar bugs"
+commands:
+  bug:
+    description: "Reportar um bug"
+    permission: bugreport.use
+  buglist:
+    description: "Listar bugs recentes"
+    permission: bugreport.staff
+  bugtp:
+    description: "Teleportar para um local de bug"
+    permission: bugreport.staff

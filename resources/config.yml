@@ -1,0 +1,27 @@
+# Configuração BugReportLite
+settings:
+  # Cooldown em segundos entre reports (Anti-Spam)
+  cooldown: 300
+  # Limite máximo de reports por dia por jogador
+  daily-limit: 5
+  # Tamanho mínimo e máximo da descrição
+  desc-min-length: 10
+  desc-max-length: 200
+
+discord:
+  enabled: false
+  webhook-url: "https://discord.com/api/webhooks/..."
+  # Nome que aparecerá no webhook
+  username: "BugReport Bot"
+
+messages:
+  prefix: "§l§6[BugReport] §r"
+  success: "§aSeu report foi enviado com sucesso! A staff agradece."
+  cooldown: "§cAguarde {TIME} segundos para enviar outro report."
+  daily-limit: "§cVocê atingiu o limite diário de reports."
+  desc-too-short: "§cA descrição é muito curta. Detalhe mais o problema."
+  cancelled: "§eEnvio cancelado."
+  staff-list-header: "§e--- Reports de Hoje ({COUNT}) ---"
+  staff-list-format: "§6#{ID} §f{PLAYER} §7- {TYPE}"
+  tp-success: "§aTeleportado para o local do bug #{ID}."
+  not-found: "§cReport não encontrado ou mundo indisponível."
