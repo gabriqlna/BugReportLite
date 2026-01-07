@@ -8,10 +8,13 @@ class SaveReportTask extends AsyncTask {
 
     public function __construct(
         private string $filePath,
-        private array $newData
+        private string $serializedData // Mudou de array para string
     ) {}
 
     public function onRun(): void {
+        // Converte a string de volta para array
+        $newData = unserialize($this->serializedData);
+
         $currentData = [];
         // Se o arquivo já existe, lê o conteúdo atual
         if (file_exists($this->filePath)) {
@@ -25,7 +28,7 @@ class SaveReportTask extends AsyncTask {
         }
 
         // Adiciona novo report usando o ID como chave
-        $currentData[$this->newData['id']] = $this->newData;
+        $currentData[$newData['id']] = $newData;
 
         // Salva de volta
         file_put_contents($this->filePath, json_encode($currentData, JSON_PRETTY_PRINT));
