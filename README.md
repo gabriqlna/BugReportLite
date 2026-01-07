@@ -127,8 +127,7 @@ Dentro de cada arquivo, os reports são indexados pelo seu **ID Único**, permit
   }
 }
 
----
-
+```
 ## ⚙️ Instalação e Configuração
 
 1.  Baixe o arquivo `.phar` ou compile o código fonte.
@@ -160,3 +159,4 @@ messages:
   prefix: "§l§6[BugReport] §r"
   success: "§aSeu report foi enviado com sucesso! A staff agradece."
   # ... (outras mensagens configuráveis)
+
