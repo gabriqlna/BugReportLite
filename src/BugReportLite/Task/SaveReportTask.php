@@ -34,3 +34,7 @@ class SaveReportTask extends AsyncTask {
         file_put_contents($this->filePath, json_encode($currentData, JSON_PRETTY_PRINT));
     }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> e48c64c (Atualiza arquivos)
