@@ -8,9 +8,9 @@ use BugReportLite\Main;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
-use jojoe77777\FormAPI\SimpleForm;
-use jojoe77777\FormAPI\CustomForm;
-use jojoe77777\FormAPI\ModalForm;
+use BugReportLite\Forms\SimpleForm;
+use BugReportLite\Forms\CustomForm;
+use BugReportLite\Forms\ModalForm;
 
 class BugCommand extends Command {
 
@@ -95,3 +95,4 @@ class BugCommand extends Command {
         $player->sendForm($form);
     }
 }
+
