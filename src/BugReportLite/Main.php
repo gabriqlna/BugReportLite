@@ -1,38 +1,78 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BugReportLite;
 
-use BugReportLite\Command\BugCommand;
-use BugReportLite\Command\BugListCommand;
-use BugReportLite\Command\BugTpCommand;
-use BugReportLite\Manager\ReportManager;
 use pocketmine\plugin\PluginBase;
+use BugReportLite\Command\BugCommand;
+use pocketmine\scheduler\AsyncTask;
+use pocketmine\player\Player;
+use pocketmine\Server;
 
 class Main extends PluginBase {
 
-    private static self $instance;
-    private ReportManager $reportManager;
+    // Coloque a URL do seu Webhook aqui (Entre aspas)
+    private string $webhookUrl = "SUA_URL_DO_DISCORD_AQUI";
 
     protected function onEnable(): void {
-        self::$instance = $this;
         $this->saveDefaultConfig();
-
-        $this->reportManager = new ReportManager($this);
-
-        $this->getServer()->getCommandMap()->registerAll("bugreport", [
-            new BugCommand($this),
-            new BugListCommand($this),
-            new BugTpCommand($this)
-        ]);
         
-        $this->getLogger()->info("BugReportLite ativado com sucesso.");
+        // Se tiver URL na config, usa ela, senão usa a hardcoded
+        if($this->getConfig()->get("webhook-url")) {
+            $this->webhookUrl = $this->getConfig()->get("webhook-url");
+        }
+
+        $this->getServer()->getCommandMap()->register("bug", new BugCommand($this));
+        $this->getLogger()->info("BugReportLite ativado!");
     }
 
-    public static function getInstance(): self {
-        return self::$instance;
-    }
+    public function sendToDiscord(Player $player, string $report): void {
+        if (empty($this->webhookUrl) || str_contains($this->webhookUrl, "SUA_URL")) {
+            $this->getLogger()->warning("Webhook do Discord não configurado!");
+            return;
+        }
 
-    public function getReportManager(): ReportManager {
-        return $this->reportManager;
+        // Cria a tarefa assíncrona para enviar os dados
+        $task = new class($this->webhookUrl, $player->getName(), $report) extends AsyncTask {
+            private string $url;
+            private string $player;
+            private string $msg;
+
+            public function __construct(string $url, string $player, string $msg) {
+                $this->url = $url;
+                $this->player = $player;
+                $this->msg = $msg;
+            }
+
+            public function onRun(): void {
+                $data = [
+                    "content" => "",
+                    "embeds" => [
+                        [
+                            "title" => "🐛 Novo Bug Reportado",
+                            "color" => 16711680, // Vermelho
+                            "fields" => [
+                                ["name" => "Jogador", "value" => $this->player, "inline" => true],
+                                ["name" => "Reporte", "value" => $this->msg]
+                            ],
+                            "footer" => ["text" => "BugReportLite"]
+                        ]
+                    ]
+                ];
+
+                $curl = curl_init();
+                curl_setopt($curl, CURLOPT_URL, $this->url);
+                curl_setopt($curl, CURLOPT_POST, true);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+                curl_setopt($curl, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+                curl_exec($curl);
+                curl_close($curl);
+            }
+        };
+
+        $this->getServer()->getAsyncPool()->submitTask($task);
     }
 }
